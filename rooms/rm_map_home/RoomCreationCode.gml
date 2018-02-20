@@ -1,0 +1,1 @@
+audio_stop_sound(a_music_login);
