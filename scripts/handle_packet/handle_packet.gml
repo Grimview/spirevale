@@ -1,139 +1,158 @@
 /// arg data buffer
-var command = buffer_read(argument0, buffer_string);
-show_debug_message("Networking Event: " + string(command));
+var command = buffer_read(argument0, buffer_u8);
+show_debug_message("command: " + string(command));
 
 switch (command) {
-	case "HELLO":
-		server_time = buffer_read(argument0, buffer_string);
-		room_goto_next();
-		show_debug_message("Server welcomes you @ " + server_time);
-	break;
+	#region Handshake
+	case HANDSHAKE:
+		// server_time = buffer_read(argument0, buffer_string);
 	
-	case "LOGIN":
-		var status, target_room, target_x, target_y, name, hp, maxHp,
-			thirst, maxThirst, hunger, maxHunger, goto_room, player,
-			woodcutting, maxWoodcutting, woodcuttingExp, maxWoodcuttingExp;
-
-		status = buffer_read(argument0, buffer_string);
+		// DEBUG: Show the time that the connection to the server is established.
+		// show_debug_message("Server welcomes you @ " + server_time);
+	break;
+	#endregion
+	
+	#region Register
+	case REGISTER:
+		var successful = buffer_read(argument0, buffer_u8);
 		
-		if (status == "TRUE") {
-			// Location and Name
-			target_room = buffer_read(argument0, buffer_string);
-			target_x = real(buffer_read(argument0, buffer_u16));
-			target_y = real(buffer_read(argument0, buffer_u16));
-			name = buffer_read(argument0, buffer_string);
+		if (successful) {			
+			// Show a registration successful notification.
 			
-			// Metabolism
-			hp = real(buffer_read(argument0, buffer_u16));
-			maxHp = real(buffer_read(argument0, buffer_u16));
-			thirst = real(buffer_read(argument0, buffer_u16));
-			maxThirst = real(buffer_read(argument0, buffer_u16));
-			hunger = real(buffer_read(argument0, buffer_u16));
-			maxHunger = real(buffer_read(argument0, buffer_u16));
-			
-			// Skills
-			woodcutting = real(buffer_read(argument0, buffer_u16));
-			maxWoodcutting = real(buffer_read(argument0, buffer_u16));
-			woodcuttingExp = real(buffer_read(argument0, buffer_u16));
-			maxWoodcuttingExp = real(buffer_read(argument0, buffer_u16));
-			
-			/*
-			room_goto(rm_user);
-			
-			gui = instance_create_layer(0, 0, "Instances", UserScreen);
-			gui.name = name;
-			gui.woodcutting = woodcutting;
-			gui.maxWoodcutting = maxWoodcutting;
-			*/
-			
-			//*
-			// Spawn at the player's stored location.
-			goto_room = asset_get_index(target_room);
-			room_goto(goto_room);
-			
-			// Create a player from the database.
-			player = instance_create_layer(target_x, target_y, "Instances", Player);
-			player.name = name;
-			player.wellbeing = hp;
-			player.maxWellbeing = maxHp;
-			player.thirst = thirst;
-			player.maxThirst = maxThirst;
-			player.hunger = hunger;
-			player.maxHunger = maxHunger;
-			player.woodcutting = woodcutting;
-			player.maxWoodcutting = maxWoodcutting;
-			player.woodcuttingExp = woodcuttingExp;
-			player.maxWoodcuttingExp = maxWoodcuttingExp;
-			//*/
+			game_restart();
 		} else {
-			show_message("Login failed.");
+			// Show a registration failed notification.
 		}
 	break;
+	#endregion
 	
-	case "REGISTER":
-		status = buffer_read(argument0, buffer_string);
+	#region Login
+	case LOGIN:
+		var successful = buffer_read(argument0, buffer_u8);
 		
-		if (status == "TRUE") {
-			show_message("Registration successful.");
+		if (successful) {
+			room_goto(CharacterScene);
 		} else {
-			show_message("Registration failed.");
+			instance_destroy(Client);
+			
+			// Show notification that login failed.
 		}
 	break;
+	#endregion
 	
-	case "POSITION":
-		username = buffer_read(argument0, buffer_string);
-		target_x = buffer_read(argument0, buffer_u16);
-		target_y = buffer_read(argument0, buffer_u16);
+	#region Character List
+	case CHARACTER:
+		var status = buffer_read(argument0, buffer_u8);
+		
+		if (status) {
+			var character = buffer_read(argument0, buffer_string);
+			
+			with (Characters) {
+				self.name = character;
+				
+				with (nameField) {
+					instance_destroy();
+				}
+			
+				with (buttonCreate) {
+					instance_destroy();
+				}
+			
+				buttonPlay = instance_create_layer(room_width / 2, room_height / 2 + 24, "Instances", Button);
+				buttonPlay.text = "Play";
+			}
+		} else {
+			with (Characters) {
+				buttonCreate = instance_create_layer(room_width / 2, room_height / 2 + 24, "Instances", Button);
+				buttonCreate.text = "Create";
+				
+				nameField = instance_create_layer(216, room_height / 2, "Instances", Textbox);
+				nameField.placeholder = "Character name";
+				nameField.width = 208;
+			}
+		}
+	break;
+	#endregion
+	
+	#region Spawn
+	case SPAWN:
+		var name = buffer_read(argument0, buffer_string);
+		var targetRoom = buffer_read(argument0, buffer_string);
+		var pos_x = buffer_read(argument0, buffer_u16);
+		var pos_y = buffer_read(argument0, buffer_u16);
+		var wellbeing = buffer_read(argument0, buffer_u16);
+		var maxWellbeing = buffer_read(argument0, buffer_u16);
+		var thirst = buffer_read(argument0, buffer_u16);
+		var maxThirst = buffer_read(argument0, buffer_u16);
+		var hunger = buffer_read(argument0, buffer_u16);
+		var maxHunger = buffer_read(argument0, buffer_u16);
+		var woodcutting = buffer_read(argument0, buffer_u16);
+		var maxWoodcutting = buffer_read(argument0, buffer_u16);
+		var woodcuttingExp = buffer_read(argument0, buffer_u16);
+		var maxWoodcuttingExp = buffer_read(argument0, buffer_u16);
+		
+		with (Player) {
+			self.name = name;
+			
+			x = real(pos_x);
+			y = real(pos_y);
+			
+			self.wellbeing = real(wellbeing);
+			self.maxWellbeing = real(maxWellbeing);
+			self.thirst = real(thirst);
+			self.maxThirst = real(maxThirst);
+			self.hunger = real(hunger);
+			self.maxHunger = real(maxHunger);
+			self.woodcutting = real(woodcutting);
+			self.maxWoodcutting = real(maxWoodcutting);
+			self.woodcuttingExp = real(woodcuttingExp);
+			self.maxWoodcuttingExp = real(maxWoodcutting);
+		}
+	break;
+	#endregion
+	
+	#region Position
+	case POSITION:
+		var name = buffer_read(argument0, buffer_string);
+		var pos_x = buffer_read(argument0, buffer_u16);
+		var pos_y = buffer_read(argument0, buffer_u16);
 		var facing = buffer_read(argument0, buffer_u16);
 		
-		foundPlayer = -1;
+		var foundPlayer = -1;
 		
 		with (RemotePlayer) {
-			if (self.name == other.username) {
-				other.foundPlayer = id;
+			if (self.name == name) {
+				foundPlayer = id;
 				break;
 			}
 		}
 		
 		if (foundPlayer != -1) {
-			foundPlayer.x = target_x;
-			foundPlayer.y = target_y;
-			foundPlayer.facing = facing;
+			foundPlayer.x = real(pos_x);
+			foundPlayer.y = real(pos_y);
+			foundPlayer.facing = real(facing);
 		} else {
-			var playerRemote = instance_create_layer(target_x, target_y, "Instances", RemotePlayer)
-			playerRemote.name = username;
+			var playerRemote = instance_create_layer(pos_x, pos_y, "Instances", RemotePlayer)
+			playerRemote.name = name;
+			
+			with (Player) {
+				if (self.name != name) {
+					player_set_location(x, y, facing);
+				}
+			}
 		}
 	break;
+	#endregion
 	
-	case "HEALTH":
-		hp = real(buffer_read(argument0, buffer_u16));
-		maxHp = real(buffer_read(argument0, buffer_u16));
+	#region Logout
+	case "logout":
+		var name = buffer_read(argument0, buffer_string);
 		
-		Player.wellbeing = hp;
-		Player.maxWellbeing = maxHp;
-	break;
-	
-	case "THIRST":
-		thirst = real(buffer_read(argument0, buffer_u16));
-		maxThirst = real(buffer_read(argument0, buffer_u16));
-		
-		Player.thirst = thirst;
-		Player.maxThirst = maxThirst;
-	break;
-	
-	case "EXP":
-		woodcuttingExp = real(buffer_read(argument0, buffer_u16));
-		maxWoodcuttingExp = real(buffer_read(argument0, buffer_u16));
-		woodcutting = real(buffer_read(argument0, buffer_u16));
-		
-		audio_play_sound(a_fx_exp, 10, false);
-		Player.woodcuttingExp = woodcuttingExp;
-		Player.maxWoodcuttingExp = maxWoodcuttingExp;
-		
-		if (Player.woodcutting != woodcutting) {
-			audio_play_sound(a_fx_levelup, 10, false);
+		with (RemotePlayer) {
+			if (self.name == name) {
+				instance_destroy();
+			}
 		}
-		
-		Player.woodcutting = woodcutting;
 	break;
+	#endregion
 }

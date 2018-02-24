@@ -31,5 +31,5 @@ draw_set_halign(fa_left);
 draw_set_valign(fa_top);
 
 if (current_action == action.drink) {
-	draw_text(window_get_width() / 2, window_get_height() / 2, "Press F to drink");
+	draw_text(window_get_width() / 2, window_get_height() / 2, "Press E to drink");
 }

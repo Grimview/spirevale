@@ -4,15 +4,13 @@
     "mvc": "1.1",
     "name": "b64a7008-fe47-41ea-b6db-e28d9f2c41d0",
     "children": [
-        "b397d4e2-c964-48de-9f42-10cf34701d23",
-        "4798f0de-ca9a-40fc-bd55-6ad0b21ae93a",
-        "f91bd1a0-6af5-433b-9e8d-bd7bfb3ed0bb",
-        "29a63040-cf37-4d40-84fa-b4e6919f9891",
-        "f4d699c4-bb07-4063-8ddd-9b582740a3f0",
-        "4cce11b5-8024-42a9-8d2b-1912fced3534"
+        "3d89bd02-d4c6-45c5-a676-e6db027e27c7",
+        "39ee61db-5e9f-400a-a549-9182482023ad",
+        "7c027154-3cfa-4429-b91b-738b8c79e579",
+        "956f6cc8-03f3-4227-9c02-0a61ea8872eb"
     ],
     "filterType": "GMSprite",
-    "folderName": "ui",
+    "folderName": "gui",
     "isDefaultView": false,
     "localisedFolderName": ""
 }

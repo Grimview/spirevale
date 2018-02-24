@@ -16,7 +16,7 @@ if (state != player_state.attacking && !speaking) {
 			move_yinput += lengthdir_y(1, this_angle);
 		
 			switch (this_key) {
-				case ord("E"):
+				case ord("D"):
 					facing = RIGHT;
 				break;
 			
@@ -57,24 +57,6 @@ switch (state) {
 		if (keyboard_check(vk_control)) {
 			state = player_state.attacking;
 			audio_play_sound(a_fx_swing, 5, false);
-			
-			switch (facing) {
-				case RIGHT:
-					instance_create_layer(x + 16, y - 8, "Instances", Hitbox);
-				break;
-			
-				case UP:
-					instance_create_layer(x, y - 24, "Instances", Hitbox);
-				break;
-			
-				case LEFT:
-					instance_create_layer(x - 16, y - 8, "Instances", Hitbox);
-				break;
-			
-				case DOWN:
-					instance_create_layer(x, y + 8, "Instances", Hitbox);
-				break;
-			}
 		}
 	break;
 	
@@ -83,19 +65,19 @@ switch (state) {
 		
 		switch (facing) {
 			case RIGHT:
-				sprite_index = spr_Hero_Right;
+				sprite_index = sprHeroRight;
 			break;
 			
 			case UP:
-				sprite_index = spr_Hero_Up;
+				sprite_index = sprHeroUp;
 			break;
 			
 			case LEFT:
-				sprite_index = spr_Hero_Left;
+				sprite_index = sprHeroLeft;
 			break;
 			
 			case DOWN:
-				sprite_index = spr_Hero_Down;
+				sprite_index = sprHeroDown;
 			break;
 		}
 		
@@ -109,21 +91,43 @@ switch (state) {
 	case player_state.attacking:
 		image_speed = 1;
 		
+		if (sprite_index == sprHeroAttackDown || sprite_index == sprHeroAttackLeft || sprite_index == sprHeroAttackRight || sprite_index == sprHeroAttackUp) {
+			if (image_index == 3) {
+				switch (facing) {
+					case RIGHT:
+						instance_create_layer(x + 16, y - 8, "Instances", Hitbox);
+					break;
+			
+					case UP:
+						instance_create_layer(x, y - 24, "Instances", Hitbox);
+					break;
+			
+					case LEFT:
+						instance_create_layer(x - 16, y - 8, "Instances", Hitbox);
+					break;
+			
+					case DOWN:
+						instance_create_layer(x, y + 8, "Instances", Hitbox);
+					break;
+				}
+			}
+		}
+		
 		switch (facing) {
 			case RIGHT:
-				sprite_index = spr_Hero_Attack_Right;
+				sprite_index = sprHeroAttackRight;
 			break;
 			
 			case UP:
-				sprite_index = spr_Hero_Attack_Up;
+				sprite_index = sprHeroAttackUp;
 			break;
 			
 			case LEFT:
-				sprite_index = spr_Hero_Attack_Left;
+				sprite_index = sprHeroAttackLeft;
 			break;
 			
 			case DOWN:
-				sprite_index = spr_Hero_Attack_Down;
+				sprite_index = sprHeroAttackDown;
 			break;
 		}
 	break;

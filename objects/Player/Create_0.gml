@@ -20,7 +20,7 @@ enum action {
 state = player_state.idle;
 
 // Create movement input handles.
-movement_inputs[0] = ord("E");
+movement_inputs[0] = ord("D");
 movement_inputs[1] = ord("W");
 movement_inputs[2] = ord("A");
 movement_inputs[3] = ord("S");
@@ -35,7 +35,7 @@ move_speed = 0.8;
 facing = DOWN;
 
 // Start thirst ticker.
-alarm_set(0, room_speed * 10);
+// alarm_set(0, room_speed * 10);
 
 current_action = action.none;
 
@@ -47,3 +47,16 @@ display = "";
 target = noone;
 
 audio_listener_orientation(0, 1, 0, 0, 0, 1);
+
+wellbeing = 0;
+maxWellbeing = 0;
+thirst = 0;
+maxThirst = 0;
+hunger = 0;
+maxHunger = 0;
+woodcutting = 0;
+maxWoodcutting = 0;
+woodcuttingExp = 0;
+maxWoodcuttingExp = 0;
+
+player_spawn();
